@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VentureCraft - Advanced Entrepreneur Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- 1. MAIN MENU SCREEN -->
+    <div id="menu-screen" class="screen active">
+        <h1>VentureCraft</h1>
+        <div style="font-style: italic; margin-bottom: 20px; color: #888;">Consumer Psychology Edition</div>
+        <button class="btn" onclick="switchScreen('mode-screen')">Play Simulation</button>
+        <button class="btn" onclick="switchScreen('upgrades-screen')">Upgrades Shop</button>
+        <button class="btn" onclick="switchScreen('settings-screen')">Settings</button>
+    </div>
+
+    <!-- 2. UPGRADES SHOP SCREEN -->
+    <div id="upgrades-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
+        <h2>Corporate Upgrade Center</h2>
+        <div class="stats-bar" style="margin-bottom: 20px;">
+            <span>Capital Check: $<span class="global-cash-display">1000</span></span>
+        </div>
+        <div class="dashboard" style="grid-template-columns: 1fr 1fr; height: auto; max-width: 900px;">
+            <div class="panel">
+                <h4>Digital Marketing Upgrades</h4>
+                <div class="upgrade-item">
+                    <p><strong>AI Copywriting Suite</strong> (Level <span id="up-copy-lvl">0</span>)<br>
+                    Adds a permanent +15% conversion multiplier to dropshipping copy evaluations.</p>
+                    <button class="btn" style="min-width:auto; padding:6px 15px; font-size:0.9rem;" onclick="buyUpgrade('copywriting')">Buy Upgrade ($<span id="up-copy-cost">200</span>)</button>
+                </div>
+                <div class="upgrade-item" style="margin-top: 15px;">
+                    <p><strong>Targeted Pixel Ads</strong> (Level <span id="up-pixel-lvl">0</span>)<br>
+                    Reduces customer price sensitivity on digital listings by 10% per tier.</p>
+                    <button class="btn" style="min-width:auto; padding:6px 15px; font-size:0.9rem;" onclick="buyUpgrade('pixel')">Buy Upgrade ($<span id="up-pixel-cost">350</span>)</button>
+                </div>
+            </div>
+            <div class="panel">
+                <h4>Brick & Mortar / Agotech</h4>
+                <div class="upgrade-item">
+                    <p><strong>Premium Storefront Lights</strong> (Level <span id="up-lights-lvl">0</span>)<br>
+                    Increases maximum local buyer wave capacity by +3 customers.</p>
+                    <button class="btn" style="min-width:auto; padding:6px 15px; font-size:0.9rem;" onclick="buyUpgrade('lights')">Buy Upgrade ($<span id="up-lights-cost">250</span>)</button>
+                </div>
+                <div class="upgrade-item" style="margin-top: 15px;">
+                    <p><strong>Hydroponic Enrichment Fluid</strong> (Level <span id="up-hydro-lvl">0</span>)<br>
+                    Accelerates farm harvest germination speeds by 25% per level.</p>
+                    <button class="btn" style="min-width:auto; padding:6px 15px; font-size:0.9rem;" onclick="buyUpgrade('hydroponics')">Buy Upgrade ($<span id="up-hydro-cost">300</span>)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SETTINGS SCREEN -->
+    <div id="settings-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
+        <h2>Game Settings</h2>
+        <button class="btn" onclick="toggleTheme()">Toggle Theme Modality</button>
+        <button class="btn" style="background:#f44336;" onclick="resetGame()">Hard Reset Corporate Data</button>
+    </div>
+
+    <!-- 4. MODE SELECTION SCREEN -->
+    <div id="mode-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
+        <h2>Select an Enterprise Industry</h2>
+        <button class="btn" onclick="startMode('dropshipping')">🌐 Dropshipping E-Commerce</button>
+        <button class="btn" onclick="startMode('local')">🏪 Local Retail Business</button>
+        <button class="btn" onclick="startMode('farm')">🌾 Agricultural Supply Chain</button>
+    </div>
+
+    <!-- 5. DROPSHIPPING MODULE -->
+    <div id="dropshipping-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
+        <div class="stats-bar">
+            <span>Capital Check: $<span class="global-cash-display">1000</span></span>
+            <span>Live SKUs: <span id="drop-count">0</span></span>
+        </div>
+        <div class="dashboard">
+            <div class="panel">
+                <h3>Storefront Configuration</h3>
+                <div class="tutorial-box">
+                    <strong>🎓 Psychology Engine Mechanics:</strong><br>
+                    • Customers analyze your <strong>Price</strong> and <strong>Description</strong>.<br>
+                    • Pricing items high above standard commodity limits ($20–$50) reduces demand to zero.<br>
+                    • Use keywords like <em>luxury, premium, durable,</em> or <em>organic</em> to boost conversion!
+                </div>
+                <label>Listing Title:</label>
+                <input type="text" id="drop-name" placeholder="e.g., Sleek Steel Thermos">
+                
+                <label>Selling Price ($):</label>
+                <input type="number" id="drop-price" placeholder="e.g., 29">
+                
+                <label>Ad Copy Pitch Description (Crucial for Conversion Evaluation):</label>
+                <textarea id="drop-desc" placeholder="Describe the item... Long, persuasive pitches packed with high-quality keywords score premium conversions. Minimal descriptions fail." rows="4" style="width:100%; border-radius:6px; background:var(--input-bg); color:var(--text-color); border:1px solid #555; padding:10px; font-family:inherit; margin-bottom:15px; resize:none;"></textarea>
+                
+                <button class="btn" style="min-width:100%; margin:5px 0 0 0;" onclick="saveProduct()">🚀 Launch Product Campaign</button>
+            </div>
+            <div class="panel" id="canvas-container">
+                <h3>Asset Designer Canvas</h3>
+                <div style="margin-bottom: 8px; display:flex; gap:5px;">
+                    <button class="color-swatch" style="background:#4caf50;" onclick="setCanvasColor('#4caf50')"></button>
+                    <button class="color-swatch" style="background:#2196f3;" onclick="setCanvasColor('#2196f3')"></button>
+                    <button class="color-swatch" style="background:#ff9800;" onclick="setCanvasColor('#ff9800')"></button>
+                    <button class="color-swatch" style="background:#e91e63;" onclick="setCanvasColor('#e91e63')"></button>
+                    <button class="color-swatch" style="background:#000000;" onclick="setCanvasColor('#000000')"></button>
+                </div>
+                <canvas id="productCanvas" width="340" height="180"></canvas>
+                <button class="btn" style="min-width:auto; padding:4px 15px; font-size:0.8rem; background:#f44336; margin-bottom:10px;" onclick="clearCanvas()">Wipe Drawing</button>
+                <h4 style="align-self:flex-start; margin-top:5px; margin-bottom:5px;">Digital Funnel Conversion Ticker:</h4>
+                <div id="drop-feed" class="live-log-box" style="width:100%; flex-grow:1;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. LOCAL BUSINESS MODULE -->
+    <div id="local-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
+        <div class="stats-bar">
+            <span>Capital Check: $<span class="global-cash-display">1000</span></span>
+            <span>Niche Model: <span id="local-type-display">None</span></span>
+        </div>
+        <div class="dashboard">
+            <div class="panel">
+                <h3>Commercial Controls</h3>
+                <div class="tutorial-box">
+                    <strong>🎓 Traffic Depreciation Rules:</strong><br>
+                    • Customers aren't infinite. Opening your shop burns localized market demand foot traffic.<br>
+                    • Running Ad Campaigns regenerates foot traffic reserves.<br>
+                    • Selling without available wholesale warehouse units ruins storefront prestige.
+                </div>
+                <label>Select Store Variant Model:</label>
+                <select id="local-niche-select" onchange="changeNiche()">
+                    <option value="food">🌮 Gourmet Food Truck Cluster ($25 retail)</option>
+                    <option value="electronics">⚡ Custom Boutique Computer Shop ($75 retail)</option>
+                </select>
+                <button class="btn" style="min-width:100%; margin:5px 0;" onclick="buyInventory()">📦 Restock Wholesale Storage Assets (-$100)</button>
+                <button class="btn" style="min-width:100%; margin:5px 0; background:#2196f3;" onclick="runMarketing()">📣 Regenerate Foot Traffic Ads (-$150)</button>
+            </div>
+            <div class="panel">
+                <h3>Storefront Operational Metrics</h3>
+                <p>On-Hand Storage Assets: <strong id="local-inv">0</strong> units</p>
+                <p>Current Foot Traffic Pool: <strong id="local-traffic-display">10</strong> potential shoppers</p>
+                <button class="btn" style="min-width:100%; margin-top:15px; background:#ff9800; font-size:1.4rem;" onclick="simulateLocalSales()">🏪 Open Shop Counter & Process Wave</button>
+                <h4 style="margin-top:20px; margin-bottom:5px;">POS Transaction Log:</h4>
+                <div id="local-log" class="live-log-box"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. FARMING MODULE -->
+    <div id="farm-screen" class="screen">
+        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
+        <div class="stats-bar">
+            <span>Capital Check: $<span class="global-cash-display">1000</span></span>
+            <span>Wheat Seeds: <span id="farm-seeds-w">5</span> | Tomato Seeds: <span id="farm-seeds-t">3</span></span>
+        </div>
+        <div class="dashboard">
+            <div class="panel">
+                <h3>Silo & Kitchen Processing</h3>
+                <div class="tutorial-box">
+                    <strong>🎓 Crop Combination Logistics:</strong><br>
+                    • Plant seeds, wait for maturity, and click plots to harvest.<br>
+                    • Single crops bake standard food, but combining <strong>Wheat + Tomato</strong> allows you to cook premium <strong>Gourmet Pasta</strong> for maximum retail value.
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="min-width:auto; flex-grow:1; font-size:0.9rem; padding:8px;" onclick="buySeeds('wheat')">🌱 Buy 5x Wheat (-$25)</button>
+                    <button class="btn" style="min-width:auto; flex-grow:1; font-size:0.9rem; padding:8px; background:#e91e63;" onclick="buySeeds('tomato')">🍅 Buy 5x Tomato (-$35)</button>
+                </div>
+                <hr style="width:100%; border:1px solid #444; margin:15px 0;">
+                <h4>Manufacturing Floor Storage</h4>
+                <p>Raw Grain: <strong id="inv-wheat">0</strong> | Raw Tomatoes: <strong id="inv-tomato">0</strong></p>
+                <p>Processed Bread: <strong id="inv-bread">0</strong> ($40 retail)</p>
+                <p>Gourmet Pasta: <strong id="inv-pasta">0</strong> ($95 retail)</p>
+                
+                <button class="btn" style="min-width:100%; margin:4px 0; background:#795548; font-size:0.95rem; padding:8px;" onclick="bakeBread()">🍞 Bake Artisan Loaf (Uses 2 Wheat)</button>
+                <button class="btn" style="min-width:100%; margin:4px 0; background:#cc1d1d; font-size:0.95rem; padding:8px;" onclick="cookPasta()">🍝 Cook Tomato Pasta (Uses 1 Wheat + 2 Tomatoes)</button>
+                <button class="btn" style="min-width:100%; margin:12px 0 4px 0; background:#e91e63; font-size:1.1rem;" onclick="sellFarmGoods()">💰 Disburse Finished Kitchen Inventory</button>
+            </div>
+            <div class="panel">
+                <h3>Soil Grid Subplot Matrix</h3>
+                <div id="farm-grid" class="farm-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
