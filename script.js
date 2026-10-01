@@ -1,3 +1,4 @@
+// --- CENTRAL DATA SYSTEM ---
 let state = {
     cash: 1000.00,
     dropshipping: { assets: [] },
@@ -5,11 +6,11 @@ let state = {
     farm: { wheatSeeds: 5, tomatoSeeds: 3, rawWheat: 0, rawTomato: 0, preparedBread: 0, preparedPasta: 0 },
     upgrades: { copywriting: 0, pixel: 0, lights: 0, hydroponics: 0 },
     stocks: {
-        '67coin': { held: 0, priceHistory: [10, 11, 10, 12, 11], currentPrice: 11, baseVolatility: 0.15 },
-        'Bitcoin': { held: 0, priceHistory: [100, 98, 102, 101, 100], currentPrice: 100, baseVolatility: 0.08 },
-        'Moscoin': { held: 0, priceHistory: [5, 4.5, 5.2, 4.8, 5], currentPrice: 5, baseVolatility: 0.25 },
-        'Gold': { held: 0, priceHistory: [50, 50.2, 49.9, 50.1, 50], currentPrice: 50, baseVolatility: 0.03 },
-        'One Piece': { held: 0, priceHistory: [1000, 950, 900, 850, 800], currentPrice: 800, baseVolatility: 0.80 }
+        '67coin': { held: 0, priceHistory: [10, 10, 10], currentPrice: 10, baseVolatility: 0.15 },
+        'Bitcoin': { held: 0, priceHistory: [100, 100, 100], currentPrice: 100, baseVolatility: 0.08 },
+        'Moscoin': { held: 0, priceHistory: [5, 5, 5], currentPrice: 5, baseVolatility: 0.25 },
+        'Gold': { held: 0, priceHistory: [50, 50, 50], currentPrice: 50, baseVolatility: 0.03 },
+        'One Piece': { held: 0, priceHistory: [1000, 1000, 1000], currentPrice: 1000, baseVolatility: 0.80 }
     }
 };
 
@@ -22,11 +23,11 @@ if (localStorage.getItem('venturecraft_save')) {
             state = { ...state, ...loadedState };
             if (!state.stocks) {
                 state.stocks = {
-                    '67coin': { held: 0, priceHistory: [10, 11, 10, 12, 11], currentPrice: 11, baseVolatility: 0.15 },
-                    'Bitcoin': { held: 0, priceHistory: [100, 98, 102, 101, 100], currentPrice: 100, baseVolatility: 0.08 },
-                    'Moscoin': { held: 0, priceHistory: [5, 4.5, 5.2, 4.8, 5], currentPrice: 5, baseVolatility: 0.25 },
-                    'Gold': { held: 0, priceHistory: [50, 50.2, 49.9, 50.1, 50], currentPrice: 50, baseVolatility: 0.03 },
-                    'One Piece': { held: 0, priceHistory: [1000, 950, 900, 850, 800], currentPrice: 800, baseVolatility: 0.80 }
+                    '67coin': { held: 0, priceHistory: [10, 10, 10], currentPrice: 10, baseVolatility: 0.15 },
+                    'Bitcoin': { held: 0, priceHistory: [100, 100, 100], currentPrice: 100, baseVolatility: 0.08 },
+                    'Moscoin': { held: 0, priceHistory: [5, 5, 5], currentPrice: 5, baseVolatility: 0.25 },
+                    'Gold': { held: 0, priceHistory: [50, 50, 50], currentPrice: 50, baseVolatility: 0.03 },
+                    'One Piece': { held: 0, priceHistory: [1000, 1000, 1000], currentPrice: 1000, baseVolatility: 0.80 }
                 };
             }
         }
@@ -242,6 +243,7 @@ window.harvestCrop = function(idx) {
 };
 
 function initStockMarketLoop() {
+    // FIXED: Changed update cycle interval from 3 seconds to 6 seconds to give the player time to type!
     setInterval(() => {
         let alerts = [];
         for (let name in state.stocks) {
@@ -259,11 +261,11 @@ function initStockMarketLoop() {
         const displayAlert = document.getElementById('market-notification');
         if (displayAlert) {
             if(alerts.length > 0 && document.getElementById('stock-screen').classList.contains('active')) {
-                displayAlert.innerText = alerts.join(" | "); displayAlert.style.display = 'block';
+                displayAlert.innerText = alerts; displayAlert.style.display = 'block';
             } else { displayAlert.style.display = 'none'; }
         }
-        if (document.getElementById('stock-screen').classList.contains('active')) renderStockMarket();
-    }, 3000);
+        if (document.getElementById('stock-screen').classList.contains('active')) updateStockPricesUIOnly();
+    }, 6000);
 }
 
 function renderStockMarket() {
@@ -272,21 +274,45 @@ function renderStockMarket() {
         let asset = state.stocks[name]; let hist = asset.priceHistory;
         let runningTrend = hist.length > 1 ? hist[hist.length - 1] >= hist[hist.length - 2] : true;
         let accentColor = runningTrend ? '#10b981' : '#ef4444';
-        let card = document.createElement('div'); card.className = 'upgrade-item'; card.style.marginBottom = '15px'; card.style.borderColor = accentColor;
+        let id = name.replace(' ', '-');
+        let card = document.createElement('div'); card.className = 'upgrade-item'; card.style.marginBottom = '15px'; card.style.borderColor = accentColor; card.id = `stock-card-${id}`;
         card.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <div><h3 style="margin:0; color:${accentColor};">${name}</h3><small>Owned: ${asset.held.toFixed(2)}</small></div>
-                <div style="text-align:right;"><div style="font-size:1.3rem; font-weight:bold; color:${accentColor};">$${asset.currentPrice.toFixed(2)}</div>
-                <small style="color:${accentColor};">${runningTrend ? '📈 WANTED' : '📉 UNWANTED'}</small></div>
+                <div><h3 style="margin:0; color:${accentColor};" class="stock-title">${name}</h3><small class="stock-owned">Owned: ${asset.held.toFixed(2)}</small></div>
+                <div style="text-align:right;"><div style="font-size:1.3rem; font-weight:bold; color:${accentColor};" class="stock-price">$${asset.currentPrice.toFixed(2)}</div>
+                <small style="color:${accentColor};" class="stock-trend">${runningTrend ? '📈 WANTED' : '📉 UNWANTED'}</small></div>
             </div>
-            <div style="height:40px; background:rgba(0,0,0,0.2); border-radius:4px; margin-bottom:10px;">
+            <div style="height:40px; background:rgba(0,0,0,0.2); border-radius:4px; margin-bottom:10px;" class="stock-svg-box">
                 <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;"><polyline fill="none" stroke="${accentColor}" stroke-width="2" points="${generateSvgPoints(hist)}"/></svg>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div><input type="number" id="amt-buy-${name.replace(' ', '-')}" placeholder="Amount ($)" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem;" onclick="tradeAsset('${name}', 'buy')">Buy</button></div>
-                <div><input type="number" id="amt-sell-${name.replace(' ', '-')}" placeholder="Units" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem; background:#ef4444;" onclick="tradeAsset('${name}', 'sell')">Sell</button></div>
+                <div><input type="number" id="amt-buy-${id}" placeholder="Amount ($)" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem;" onclick="tradeAsset('${name}', 'buy')">Buy</button></div>
+                <div><input type="number" id="amt-sell-${id}" placeholder="Units" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem; background:#ef4444;" onclick="tradeAsset('${name}', 'sell')">Sell</button></div>
             </div>`;
         container.appendChild(card);
+    }
+}
+
+// FIXED: This fine-tuned method updates numbers/graphs dynamically WITHOUT wiping out or resetting input boxes you are typing in!
+function updateStockPricesUIOnly() {
+    for (let name in state.stocks) {
+        let asset = state.stocks[name]; let hist = asset.priceHistory;
+        let runningTrend = hist.length > 1 ? hist[hist.length - 1] >= hist[hist.length - 2] : true;
+        let accentColor = runningTrend ? '#10b981' : '#ef4444';
+        let id = name.replace(' ', '-');
+        let card = document.getElementById(`stock-card-${id}`);
+        if (card) {
+            card.style.borderColor = accentColor;
+            card.querySelector('.stock-owned').innerText = `Owned: ${asset.held.toFixed(2)}`;
+            let priceEl = card.querySelector('.stock-price');
+            priceEl.innerText = `$${asset.currentPrice.toFixed(2)}`;
+            priceEl.style.color = accentColor;
+            let trendEl = card.querySelector('.stock-trend');
+            trendEl.innerText = runningTrend ? '📈 WANTED' : '📉 UNWANTED';
+            trendEl.style.color = accentColor;
+            card.querySelector('.stock-title').style.color = accentColor;
+            card.querySelector('.stock-svg-box').innerHTML = `<svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;"><polyline fill="none" stroke="${accentColor}" stroke-width="2" points="${generateSvgPoints(hist)}"/></svg>`;
+        }
     }
 }
 
@@ -308,5 +334,5 @@ window.tradeAsset = function(name, action) {
         state.cash = parseFloat((state.cash + (units * asset.currentPrice)).toFixed(2)); asset.held -= units;
     }
     document.getElementById(`amt-buy-${id}`).value = ''; document.getElementById(`amt-sell-${id}`).value = '';
-    saveProfile(); refreshUI(); renderStockMarket();
+    saveProfile(); refreshUI(); updateStockPricesUIOnly();
 };
