@@ -53,6 +53,10 @@ function refreshUI() {
     if (document.getElementById('farm-seeds-t')) document.getElementById('farm-seeds-t').innerText = state.farm.tomatoSeeds;
     if (document.getElementById('inv-wheat')) document.getElementById('inv-wheat').innerText = state.farm.rawWheat;
     if (document.getElementById('inv-tomato')) document.getElementById('inv-tomato').innerText = state.farm.rawTomato;
+    
+    // Processed products rendering update
+    if (document.getElementById('inv-bread')) document.getElementById('inv-bread').innerText = state.farm.preparedBread;
+    if (document.getElementById('inv-pasta')) document.getElementById('inv-pasta').innerText = state.farm.preparedPasta;
 
     document.getElementById('up-copy-lvl').innerText = state.upgrades.copywriting;
     document.getElementById('up-copy-cost').innerText = state.upgrades.copywriting >= 10 ? 'MAX' : (state.upgrades.copywriting + 1) * 200;
@@ -82,6 +86,7 @@ function buySeeds(type) {
     else { return alert("Not enough cash for seeds!"); }
     saveProfile(); refreshUI();
 }
+
 const board = document.getElementById('productCanvas');
 let drawEngine = board ? board.getContext('2d') : null;
 let painting = false, lastDrawX = 0, lastDrawY = 0, currentPenColor = '#000000';
@@ -146,6 +151,7 @@ setInterval(() => {
         }
     }
 }, 3000);
+
 function renderFields() {
     const grid = document.getElementById('farmPlotsContainer'); if (!grid) return; grid.innerHTML = '';
     farmPlots.forEach((plot, idx) => {
@@ -184,6 +190,59 @@ window.harvestCrop = function(idx) {
     saveProfile(); renderFields(); refreshUI();
 };
 
+// Processing Kitchen Logic
+window.processFood = function(type) {
+    if (type === 'bread') {
+        if (state.farm.rawWheat >= 3) {
+            state.farm.rawWheat -= 3;
+            state.farm.preparedBread += 1;
+            logFarmMessage("🍞 Baked 1x Fresh Bread!", "#38bdf8");
+        } else {
+            alert("Not enough Raw Wheat! You need 3 units.");
+        }
+    } else if (type === 'pasta') {
+        if (state.farm.rawWheat >= 2 && state.farm.rawTomato >= 2) {
+            state.farm.rawWheat -= 2;
+            state.farm.rawTomato -= 2;
+            state.farm.preparedPasta += 1;
+            logFarmMessage("🍝 Cooked 1x Tomato Pasta!", "#38bdf8");
+        } else {
+            alert("Not enough ingredients! You need 2 Wheat and 2 Tomatoes.");
+        }
+    }
+    saveProfile();
+    refreshUI();
+};
+
+window.sellFood = function(type) {
+    if (type === 'bread') {
+        if (state.farm.preparedBread > 0) {
+            state.farm.preparedBread -= 1;
+            state.cash = parseFloat((state.cash + 45.00).toFixed(2));
+            logFarmMessage("💰 Sold 1x Fresh Bread for $45.00!", "#4caf50");
+        } else {
+            alert("You don't have any Bread to sell!");
+        }
+    } else if (type === 'pasta') {
+        if (state.farm.preparedPasta > 0) {
+            state.farm.preparedPasta -= 1;
+            state.cash = parseFloat((state.cash + 90.00).toFixed(2));
+            logFarmMessage("💰 Sold 1x Tomato Pasta for $90.00!", "#4caf50");
+        } else {
+            alert("You don't have any Pasta to sell!");
+        }
+    }
+    saveProfile();
+    refreshUI();
+};
+
+function logFarmMessage(msg, color = "#fff") {
+    const feed = document.getElementById('farm-feed');
+    if (feed) {
+        feed.innerHTML = `<div style="color:${color};">[KITCHEN] ${msg}</div>` + feed.innerHTML;
+    }
+}
+
 function initStockMarketHTML() {
     const container = document.getElementById('stock-grid-container'); if (!container) return; container.innerHTML = '';
     for (let name in state.stocks) {
@@ -198,8 +257,8 @@ function initStockMarketHTML() {
                 <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;"><polyline fill="none" id="stock-polyline-${id}" stroke="#10b981" stroke-width="2" points="0,20 100,20"/></svg>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                <div><input type="number" id="amt-buy-${id}" placeholder="Amount ($)" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem;" onclick="tradeAsset('${name}', 'buy')">Buy</button></div>
-                <div><input type="number" id="amt-sell-${id}" placeholder="Units" style="margin-bottom:5px; padding:5px;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem; background:#ef4444;" onclick="tradeAsset('${name}', 'sell')">Sell</button></div>
+                <div><input type="number" id="amt-buy-${id}" placeholder="Amount ($)" style="margin-bottom:5px; padding:5px; width:80%;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem;" onclick="tradeAsset('${name}', 'buy')">Buy</button></div>
+                <div><input type="number" id="amt-sell-${id}" placeholder="Units" style="margin-bottom:5px; padding:5px; width:80%;"><button class="btn" style="min-width:100%; margin:0; padding:6px; font-size:0.85rem; background:#ef4444;" onclick="tradeAsset('${name}', 'sell')">Sell</button></div>
             </div>`;
         container.appendChild(card);
     }
