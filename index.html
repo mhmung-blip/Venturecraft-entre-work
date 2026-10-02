@@ -3,130 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VentureCraft</title>
+    <title>Venturecraft - Entrepreneurship Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="menu-screen" class="screen active">
-        <h1>VentureCraft</h1>
-        <div style="font-style: italic; margin-bottom: 20px; color: #888;">Consumer Psychology Edition</div>
-        <button class="btn" onclick="switchScreen('mode-screen')">Play Simulation</button>
-        <button class="btn" onclick="switchScreen('upgrades-screen')">Upgrades Shop</button>
-        <button class="btn" onclick="switchScreen('settings-screen')">Settings</button>
+    <div class="top-bar">
+        <h2>Venturecraft 🚀</h2>
+        <div>Cash: $<span class="global-cash-display">1000.00</span></div>
+        <button class="btn" style="min-width:auto; padding:5px 10px; background:#4a5568;" onclick="toggleTheme()">🌓 Theme</button>
     </div>
 
-    <div id="upgrades-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
-        <h2>Upgrade Center</h2>
-        <div class="stats-bar" style="margin-bottom: 20px;"><span>Capital: $<span class="global-cash-display">1000</span></span></div>
-        <div class="dashboard" style="grid-template-columns: 1fr 1fr; max-width: 900px;">
-            <div class="panel">
-                <div class="upgrade-item">
-                    <p><strong>AI Copywriting</strong> (Level <span id="up-copy-lvl">0</span>/10)</p>
-                    <button class="btn" style="min-width:auto; padding:6px 15px;" onclick="buyUpgrade('copywriting')">Upgrade ($<span id="up-copy-cost">200</span>)</button>
-                </div>
-                <div class="upgrade-item" style="margin-top: 15px;">
-                    <p><strong>Pixel Ads</strong> (Level <span id="up-pixel-lvl">0</span>/10)</p>
-                    <button class="btn" style="min-width:auto; padding:6px 15px;" onclick="buyUpgrade('pixel')">Upgrade ($<span id="up-pixel-cost">350</span>)</button>
+    <div class="main-container">
+        <div class="sidebar">
+            <button class="btn" onclick="switchScreen('dashboard-screen')">📊 Dashboard</button>
+            <button class="btn" onclick="switchScreen('dropshipping-screen')">📦 Dropshipping</button>
+            <button class="btn" onclick="switchScreen('local-screen')">🏪 Local Storefront</button>
+            <button class="btn" onclick="startMode('farm')">🌾 Automated Farm</button>
+            <button class="btn" onclick="switchScreen('stock-screen')">📈 Stock Market</button>
+            <hr style="border:1px solid #4a5568; margin:15px 0;">
+            <button class="btn" style="background:#ef4444;" onclick="resetGame()">🚨 Reset Game</button>
+        </div>
+
+        <div class="content-area">
+            <!-- DASHBOARD SCREEN -->
+            <div id="dashboard-screen" class="screen active">
+                <h2>Business Dashboard</h2>
+                <div class="dashboard-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div class="panel">
+                        <h3>Business Assets</h3>
+                        <p>Total Cash: $<span class="global-cash-display">1000.00</span></p>
+                        <p>Dropshipping Products: <span id="drop-count">0</span></p>
+                        <p>Storefront Niche: <span id="local-type-display">🌮 Food Truck</span></p>
+                    </div>
+                    <div class="panel">
+                        <h3>HQ Upgrades</h3>
+                        <div class="upgrade-item">
+                            <div><strong>Copywriting</strong> (Lvl <span id="up-copy-lvl">0</span>)</div>
+                            <button class="btn" onclick="buyUpgrade('copywriting')">Upgrade ($<span id="up-copy-cost">200</span>)</button>
+                        </div>
+                        <div class="upgrade-item">
+                            <div><strong>Tracking Pixel</strong> (Lvl <span id="up-pixel-lvl">0</span>)</div>
+                            <button class="btn" onclick="buyUpgrade('pixel')">Upgrade ($<span id="up-pixel-cost">350</span>)</button>
+                        </div>
+                        <div class="upgrade-item">
+                            <div><strong>Neon Lights</strong> (Lvl <span id="up-lights-lvl">0</span>)</div>
+                            <button class="btn" onclick="buyUpgrade('lights')">Upgrade ($<span id="up-lights-cost">250</span>)</button>
+                        </div>
+                        <div class="upgrade-item">
+                            <div><strong>Hydroponics</strong> (Lvl <span id="up-hydro-lvl">0</span>)</div>
+                            <button class="btn" onclick="buyUpgrade('hydroponic')">Upgrade ($<span id="up-hydro-cost">300</span>)</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="panel">
-                <div class="upgrade-item">
-                    <p><strong>Storefront Lights</strong> (Level <span id="up-lights-lvl">0</span>/10)</p>
-                    <button class="btn" style="min-width:auto; padding:6px 15px;" onclick="buyUpgrade('lights')">Upgrade ($<span id="up-lights-cost">250</span>)</button>
+
+            <!-- DROPSHIPPING SCREEN -->
+            <div id="dropshipping-screen" class="screen">
+                <h2>E-Commerce & Dropshipping</h2>
+                <div class="panel">
+                    <h3>Design New Product</h3>
+                    <input type="text" id="drop-name" placeholder="Product Name"><br><br>
+                    <input type="number" id="drop-price" placeholder="Retail Price ($)"><br><br>
+                    <textarea id="drop-desc" placeholder="Write landing page ad copy..." rows="3" style="width:100%; border-radius:4px; background:#2d3748; color:#fff; border:1px solid #4a5568; padding:8px;"></textarea><br><br>
+                    
+                    <label>Product Mockup Canvas:</label><br>
+                    <canvas id="productCanvas" style="background:#fff; border:2px solid #4a5568; border-radius:4px; cursor:crosshair; margin-bottom:10px; display:block; width:100%; height:150px;"></canvas>
+                    <button class="btn" style="min-width:auto; background:#718096;" onclick="clearCanvas()">Clear Canvas</button>
+                    <button class="btn" style="background:#10b981;" onclick="saveProduct()">Launch Campaign</button>
                 </div>
-                <div class="upgrade-item" style="margin-top: 15px;">
-                    <p><strong>Hydroponic Fluid</strong> (Level <span id="up-hydro-lvl">0</span>/10)</p>
-                    <button class="btn" style="min-width:auto; padding:6px 15px;" onclick="buyUpgrade('hydroponics')">Upgrade ($<span id="up-hydro-cost">300</span>)</button>
+                <div class="panel">
+                    <h3>Live Sales Feed</h3>
+                    <div id="drop-feed" class="live-log-box"></div>
                 </div>
+            </div>
+
+            <!-- LOCAL SCREEN -->
+            <div id="local-screen" class="screen">
+                <h2>Local Storefront Operations</h2>
+                <div class="panel">
+                    <h3>Manage Franchise Niche</h3>
+                    <select id="local-niche-select" onchange="changeNiche()" style="padding:10px; width:100%; background:#2d3748; color:#fff; border:1px solid #4a5568; border-radius:4px;">
+                        <option value="food">🌮 Food Truck (Low Cost, Faster Sales)</option>
+                        <option value="electronics">⚡ Electronics Boutique (High Profit, Slower Sales)</option>
+                    </select>
+                    <p>Current Inventory Stock: <span id="local-inv">10</span> units</p>
+                    <p>Base Hourly Foot Traffic: <span id="local-traffic-display">12</span> visitors</p>
+                    <button class="btn" onclick="buyInventory()">Restock Bulk Inventory ($100 for 10x Units)</button>
+                </div>
+                <div class="panel">
+                    <h3>Store POS Feed</h3>
+                    <div id="local-feed" class="live-log-box"></div>
+                </div>
+            </div>
+
+            <!-- FARM SCREEN -->
+            <div id="farm-screen" class="screen">
+                <h2>Automated Farm Plots</h2>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div class="panel">
+                        <h3>Seed Supplier & Silo</h3>
+                        <button class="btn" onclick="buySeeds('wheat')">Buy Wheat Seeds (5x for $10)</button>
+                        <button class="btn" style="background:#ff9800;" onclick="buySeeds('tomato')">Buy Tomato Seeds (3x for $25)</button>
+                        <hr style="border:1px solid #4a5568; margin:15px 0;">
+                        <h4>Silo Raw Materials</h4>
+                        <p>🌾 Wheat Seeds: <span id="farm-seeds-w">5</span> | 🍅 Tomato Seeds: <span id="farm-seeds-t">3</span></p>
+                        <p>Raw Wheat in Silo: <span id="inv-wheat">0</span></p>
+                        <p>Raw Tomato in Silo: <span id="inv-tomato">0</span></p>
+                    </div>
+
+                    <div class="panel">
+                        <h3>🍳 Kitchen & Processing Market</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="upgrade-item" style="text-align: center; flex-direction:column; align-items:stretch;">
+                                <h4>🍞 Fresh Bread</h4>
+                                <p style="font-size: 0.75rem; color: #a0aec0; margin:4px 0;">Requires: 3 Raw Wheat</p>
+                                <p style="margin:5px 0;">Inventory: <strong id="inv-bread">0</strong></p>
+                                <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="processFood('bread')">Bake Bread</button>
+                                <button class="btn" style="padding:6px; font-size:0.8rem; background: #10b981;" onclick="sellFood('bread')">Sell ($45.00)</button>
+                            </div>
+                            <div class="upgrade-item" style="text-align: center; flex-direction:column; align-items:stretch;">
+                                <h4>🍝 Tomato Pasta</h4>
+                                <p style="font-size: 0.75rem; color: #a0aec0; margin:4px 0;">Requires: 2 Wheat + 2 Tomato</p>
+                                <p style="margin:5px 0;">Inventory: <strong id="inv-pasta">0</strong></p>
+                                <button class="btn" style="padding:6px; font-size:0.8rem;" onclick="processFood('pasta')">Cook Pasta</button>
+                                <button class="btn" style="padding:6px; font-size:0.8rem; background: #10b981;" onclick="sellFood('pasta')">Sell ($90.00)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top:20px;">
+                    <h3>Your Arable Fields</h3>
+                    <div id="farmPlotsContainer" class="dashboard-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:15px;"></div>
+                </div>
+
+                <div class="panel" style="margin-top:20px;">
+                    <h3>Farm & Kitchen Activity Log</h3>
+                    <div id="farm-feed" class="live-log-box">
+                        <div>[FARM] Automation and processing kitchen online.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STOCK SCREEN -->
+            <div id="stock-screen" class="screen">
+                <h2>High-Frequency Asset Trading</h2>
+                <div id="market-notification" style="background:#b91c1c; color:#fff; padding:10px; border-radius:4px; margin-bottom:15px; display:none; font-weight:bold;"></div>
+                <div id="stock-grid-container" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;"></div>
             </div>
         </div>
     </div>
-
-    <div id="settings-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
-        <h2>Settings</h2>
-        <button class="btn" onclick="toggleTheme()">Toggle Theme</button>
-        <button class="btn" style="background:#f44336;" onclick="resetGame()">Hard Reset</button>
-    </div>
-
-    <div id="mode-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('menu-screen')">&larr; Menu</button>
-        <h2>Select Industry</h2>
-        <button class="btn" onclick="startMode('dropshipping')">🌐 Dropshipping</button>
-        <button class="btn" onclick="startMode('local')">🏪 Local Retail</button>
-        <button class="btn" onclick="startMode('farm')">🌾 Farming Grid</button>
-        <button class="btn" style="background:#8b5cf6;" onclick="switchScreen('stock-screen')">📈 Stock Market</button>
-    </div>
-
-    <div id="dropshipping-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
-        <div class="stats-bar"><span>Capital: $<span class="global-cash-display">1000</span></span><span>SKUs: <span id="drop-count">0</span></span></div>
-        <div class="dashboard">
-            <div class="panel">
-                <input type="text" id="drop-name" placeholder="Title">
-                <input type="number" id="drop-price" placeholder="Price">
-                <textarea id="drop-desc" placeholder="Ad Copy Pitch Description..." rows="4" style="resize:none;"></textarea>
-                <button class="btn" style="min-width:100%;" onclick="saveProduct()">🚀 Launch Product</button>
-            </div>
-            <div class="panel">
-                <div style="margin-bottom: 8px; display:flex; gap:5px;">
-                    <button class="color-swatch" style="background:#4caf50;" onclick="setCanvasColor('#4caf50')"></button>
-                    <button class="color-swatch" style="background:#2196f3;" onclick="setCanvasColor('#2196f3')"></button>
-                    <button class="color-swatch" style="background:#000000;" onclick="setCanvasColor('#000000')"></button>
-                </div>
-                <canvas id="productCanvas" style="width:100%; height:150px;"></canvas>
-                <button class="btn" style="min-width:auto; padding:4px 15px; background:#f44336;" onclick="clearCanvas()">Wipe</button>
-                <div id="drop-feed" class="live-log-box" style="width:100%; flex-grow:1;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="local-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
-        <div class="stats-bar"><span>Capital: $<span class="global-cash-display">1000</span></span><span>Niche: <span id="local-type-display">None</span></span></div>
-        <div class="dashboard">
-            <div class="panel">
-                <select id="local-niche-select" onchange="changeNiche()">
-                    <option value="food">🌮 Food Truck</option>
-                    <option value="electronics">⚡ Electronics Shop</option>
-                </select>
-                <button class="btn" style="min-width:100%;" onclick="buyInventory()">📦 Restock Shelf ($100 for +10)</button>
-            </div>
-            <div class="panel">
-                <div>Stock: <span id="local-inv">0</span> left</div>
-                <div>Traffic: <span id="local-traffic-display">0</span> buyers</div>
-                <div id="local-feed" class="live-log-box" style="width:100%; margin-top:10px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="farm-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
-        <div class="stats-bar"><span>Capital: $<span class="global-cash-display">1000</span></span><span>Wheat Seeds: <span id="farm-seeds-w">0</span> | Tomato: <span id="farm-seeds-t">0</span></span></div>
-        <div class="dashboard">
-            <div class="panel">
-                <div>Wheat: <span id="inv-wheat">0</span> | Tomato: <span id="inv-tomato">0</span></div>
-                <div class="upgrade-item" style="margin-top:10px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>Wheat Seeds Pack</span><button class="btn" style="min-width:auto; padding:5px 10px;" onclick="buySeeds('wheat')">Buy $10</button>
-                </div>
-                <div class="upgrade-item" style="margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>Tomato Seeds Pack</span><button class="btn" style="min-width:auto; padding:5px 10px; background:#ff9800;" onclick="buySeeds('tomato')">Buy $25</button>
-                </div>
-            </div>
-            <div class="panel"><div id="farmPlotsContainer" class="farm-grid"></div></div>
-        </div>
-    </div>
-
-    <div id="stock-screen" class="screen">
-        <button class="btn btn-back" onclick="switchScreen('mode-screen')">&larr; Back</button>
-        <div class="stats-bar"><span>Capital: $<span class="global-cash-display">1000</span></span><span>Trading Desk</span></div>
-        <div id="market-notification" class="tutorial-box" style="display:none; background:rgba(16,185,129,0.15); border-left-color:#10b981; margin-top:15px; width:100%; max-width:900px;"></div>
-        <div style="width:100%; max-width:900px; margin-top:20px;">
-            <div class="panel" style="width:100%;"><div id="stock-grid-container" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px;"></div></div>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
